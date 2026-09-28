@@ -1,0 +1,70 @@
+{
+  "providers": [
+    {
+      "name": "balanced-us",
+      "model": "synthetic-balanced-v1",
+      "regions": [
+        "us"
+      ],
+      "capabilities": [
+        "chat"
+      ],
+      "cost_per_million_tokens": 4,
+      "p95_latency_ms": 430,
+      "quality": 0.86,
+      "reliability": 0.999
+    },
+    {
+      "name": "quality-us",
+      "model": "synthetic-quality-v1",
+      "regions": [
+        "us"
+      ],
+      "capabilities": [
+        "chat"
+      ],
+      "cost_per_million_tokens": 12,
+      "p95_latency_ms": 850,
+      "quality": 0.94,
+      "reliability": 0.995
+    },
+    {
+      "name": "balanced-eu",
+      "model": "synthetic-balanced-v1",
+      "regions": [
+        "eu"
+      ],
+      "capabilities": [
+        "chat"
+      ],
+      "cost_per_million_tokens": 4.5,
+      "p95_latency_ms": 470,
+      "quality": 0.87,
+      "reliability": 0.998
+    }
+  ],
+  "tenants": {
+    "demo": {
+      "regions": [
+        "us"
+      ],
+      "capabilities": [
+        "chat"
+      ],
+      "max_cost_per_million": 15,
+      "token_budget": 10000,
+      "requests_per_minute": 60
+    },
+    "research-eu": {
+      "regions": [
+        "eu"
+      ],
+      "capabilities": [
+        "chat"
+      ],
+      "max_cost_per_million": 8,
+      "token_budget": 5000,
+      "requests_per_minute": 30
+    }
+  }
+}

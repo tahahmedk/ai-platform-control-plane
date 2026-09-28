@@ -1,0 +1,15 @@
+# Design example ONLY: use after shared durable admission and authenticated tenancy.
+# Applying this to the local mock deployment invalidates its budget/rate semantics.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-platform-control-plane
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: ai-platform-control-plane}
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 65}

@@ -1,0 +1,9 @@
+# Design example ONLY: pair with the future multi-replica deployment, not the sandbox.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ai-platform-control-plane
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: ai-platform-control-plane}
