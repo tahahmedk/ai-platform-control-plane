@@ -1,14 +1,18 @@
 # AI Platform Control Plane
 
-A runnable inference control plane for deciding **which model may serve a request,
-what capacity it may consume, and how failures are handled**. All adapters are
-synthetic; no paid account, model download, or API key is required.
+A FastAPI control plane for model selection, tenant policy, capacity admission and
+provider failure handling. The adapters are synthetic, so the full request path runs
+without API keys or a paid model service.
 
-Routing is easy until regional policy, cost ceilings, tenant capacity and provider
-failures must hold at the same time. This implementation keeps policy decisions
-separate from provider execution and tests the boundaries through an HTTP API.
+## Why I built this
 
-## Architecture
+Once inference involves more than one model call, someone has to own the rules:
+which model is eligible, whose budget is charged, whether a fallback is allowed,
+and what an operator can see when it fails. I built this to make that ownership
+explicit. The useful design work here is the control plane around inference;
+a chat interface would add little to that question.
+
+## Proposed boundary and request path
 
 ```mermaid
 flowchart LR
@@ -37,7 +41,7 @@ flowchart LR
 - `evals.py` offers an offline lexical regression signal. It is not a semantic
   quality evaluator and does not automatically retune routing.
 
-## Run and test
+## Exercise the API
 
 Python 3.11–3.13:
 
@@ -65,7 +69,7 @@ Tests cover HTTP validation, tenant denial, budget/rate rejection, concurrent
 reservations, timeout fallback, output filtering and circuit cooldown behavior.
 CI runs tests, formatting, lint and the demo on three Python versions.
 
-## Failure and operational behavior
+## Failure contract
 
 | Condition | Behavior |
 | --- | --- |
@@ -83,7 +87,7 @@ Prometheus exposition). Health endpoints report process/config readiness, not
 upstream model availability. A cooldown makes a failed provider eligible again;
 a distributed half-open probe lease is deliberately not implemented.
 
-## Deployment boundary and evolution
+## Deployment scope
 
 **This is a local, unauthenticated mock sandbox.** Tenant labels are trusted only
 for demonstrations; callers can impersonate labels. Do not expose it publicly or
@@ -98,10 +102,13 @@ Load the image into your local cluster first. HPA and PDB files are **future des
 examples**; do not apply them to the local ledger. Container/cluster execution
 requires Docker/Kubernetes and is not implied by unit-test success.
 
-Next production steps: transactional shared budgets with reset periods, authenticated
-tenant resolution, a durable inference audit, exporter-backed telemetry and measured
-model evaluations. Scoring currently uses synthetic static metadata, not live SLOs.
-See [decisions](docs/ADR-002-admission-and-resilience.md) and [runbook](docs/runbook.md).
+Scoring uses synthetic static metadata, not live SLOs. I chose a narrow provider
+interface so routing and admission do not inherit application workflow semantics;
+[ADR-003 explains why this layer does not depend on LangChain or another agent framework](docs/ADR-003-framework-boundary.md).
+The [admission decision](docs/ADR-002-admission-and-resilience.md) covers conservative
+accounting, and the [runbook](docs/runbook.md) covers diagnosis.
+The [next engineering steps](FUTURE_WORK.md) are durable admission, measured routing
+evaluation and exported telemetry, not claims about features already built.
 
-Independent clean-room implementation using synthetic data and generic architecture
-patterns; no employer source, configuration, architecture or confidential artifacts.
+This is an independent clean-room project, not a claimed production deployment.
+It uses synthetic examples and contains no employer code or confidential material.
